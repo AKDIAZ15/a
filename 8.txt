@@ -1,0 +1,42 @@
+library(cluster)
+library(rattle)
+library(factoextra)
+library(dplyr)
+library(forecast)
+library(ggplot2)
+library(car)
+library(caret)
+library(moments)
+
+normalize <- function(data) {
+  (data - min(data)) / (max(data) - min(data))
+}
+
+data("wine")
+head(wine)
+
+wine_data <- wine[, -1]
+wine_norm <- as.data.frame(lapply(wine_data, normalize))
+head(wine_norm)
+
+wine_pca <- prcomp(wine_norm, scale. = TRUE)
+wine_pca_data <- as.data.frame(wine_pca$x[, 1:2])
+colnames(wine_pca_data) <- c("PC1", "PC2")
+
+elbow_wine <- fviz_nbclust(wine_pca_data, kmeans, method = "wss")
+print(elbow_wine)
+
+silhouette_wine <- fviz_nbclust(wine_pca_data, kmeans, method = "silhouette")
+print(silhouette_wine)
+
+set.seed(42)
+wine_kmeans <- kmeans(wine_pca_data, centers = 3, nstart = 25)
+wine_pca_data$cluster <- as.factor(wine_kmeans$cluster)
+
+ggplot(wine_pca_data, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(size = 3) +
+  labs(title = "KMeans for Wine Dataset") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))
+
+cat("\nCluster Size:", wine_kmeans$size)
