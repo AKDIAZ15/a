@@ -1,0 +1,14 @@
+library(dplyr)
+library(plotly)
+library(gapminder)
+scatter=plot_ly(gapminder,x=~gdpPercap,y=~lifeExp,color=~continent,type='scatter',mode='markers')%>%
+layout(title="GDP per capital vs Life Expectency")
+print(scatter)
+bar=plot_ly(gapminder[gapminder$year==2007,],x=~country,y=~lifeExp,type='bar')%>%
+layout(title="Life expectancy in year 2007")
+print(bar)
+line=plot_ly(gapminder[gapminder$continent=='Asia',],x=~year,y=~lifeExp,color=~country,type='scatter',molayout(title="Life expectency in Asia")
+print(line)
+dominant=subplot(scatter,bar,line)%>%
+layout(title="Combinations of subplots")
+print(dominant)
